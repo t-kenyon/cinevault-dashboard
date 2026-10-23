@@ -140,6 +140,5 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 @media(max-width:640px){.member-name{gap:6px;min-height:44px}.leaderboard td:first-child{overflow-wrap:anywhere}}
 
 .dot-unavailable{background:#c5a16a;box-shadow:none}
-.demo-analytics-note{color:var(--muted);font-size:12px;line-height:1.6;margin:0 0 20px}
 
 .avatar{overflow:hidden;flex-shrink:0}.avatar img{width:100%;height:100%;object-fit:cover}.screening-member{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.screening-member .avatar{width:22px;height:22px;font-size:10px}
