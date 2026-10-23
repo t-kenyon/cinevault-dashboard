@@ -11,7 +11,7 @@ function ScreeningTitle({title,year}: {title:string;year?:number}) {
   const validYear = releaseYear(year);
   const suffix = validYear ? ` (${validYear})` : "";
   const name = suffix && title.trimEnd().endsWith(suffix) ? title.trimEnd().slice(0,-suffix.length) : title;
-  return <><h3>{name}</h3><p className="screening-year">{validYear ?? ""}</p></>;
+  return <h3>{name}</h3>;
 }
 
 type Screening = {id:string; title:string; year?:number; poster?:string; name:string; photo?:string; date:string; relativeDate:string};
@@ -62,7 +62,7 @@ export function RecentScreenings({recent,initialNowPlaying,demo,unavailable}: {r
         <ScreeningTitle title={play.title} year={play.year} />
         <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span>{play.name}</span></p>
       </li>)}
-      {recent.map(play => <li key={play.id}><div className="screening-art"><MoviePoster src={play.poster} title={movieTitle(play.title,play.year)} large /><div className="screening-status"><p className="screening-date"><time dateTime={play.date}>{play.relativeDate}</time></p></div></div><ScreeningTitle title={play.title} year={play.year} /><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span>{play.name}</span></p></li>)}
+      {recent.map(play => <li key={play.id}><div className="screening-art"><MoviePoster src={play.poster} title={movieTitle(play.title,play.year)} large /></div><ScreeningTitle title={play.title} year={play.year} /><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span>{play.name}</span></p><p className="screening-date"><time dateTime={play.date}>{play.relativeDate}</time></p></li>)}
     </RecentScroller>
     {!demo && active.state === "unavailable" && <p className="note" role="status">Now Playing temporarily unavailable.</p>}
     {unavailable ? <p className="note">Recent screenings temporarily unavailable.</p> : !recent.length && !active.items.length && <p className="note">No completed screenings to share yet.</p>}
