@@ -58,7 +58,7 @@ To update, fetch and fast-forward the review branch in the checkout, rebuild the
 
 Confirm Tautulli's version and reachable base URL from the dashboard container. With bridge networking, `localhost` refers to the dashboard container, not Unraid or Tautulli. Use the actual server LAN address and published Tautulli port, or attach both containers to an existing suitable user-defined network and use the Tautulli container name. Do not change existing Tautulli networking just for this setup.
 
-Tautulli 2.18+ supports the preferred `X-Api-Key` header. Credentials should be supplied only at runtime from private environment/secret storage, never during Docker build. `.dockerignore` excludes environment files from the build context. No live adapter is enabled yet, so adding keys alone currently has no effect.
+Tautulli 2.18+ supports the preferred `X-Api-Key` header. Credentials should be supplied only at runtime from private environment/secret storage, never during Docker build. `.dockerignore` excludes environment files from the build context. The status/inventory adapter is opt-in. Set `CINEVAULT_DATA_MODE=tautulli` with the URL and API key only at runtime; see [Tautulli setup](TAUTULLI.md).
 
 The next reviewed change should connect status and movie-library totals only. Keep personal analytics on fictional fixtures until consent is recorded. Public remote access, reverse proxy configuration, or private VPN access can be decided after the LAN deployment works.
 

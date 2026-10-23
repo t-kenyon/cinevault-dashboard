@@ -53,3 +53,13 @@ Before enabling live mode, implement timeouts, validated/allowlisted responses, 
 ## Unraid deployment
 
 KenyonVault can host the dashboard as a Docker container. The repository includes a multistage Dockerfile, loopback-default Compose configuration, and [Unraid deployment instructions](docs/UNRAID.md). Start in demo mode on the LAN. Docker is not available in the authoring environment, so the actual Linux image must still be built and verified on the target host.
+
+## Live status and inventory via Tautulli
+
+The first live adapter requests only `get_server_identity` (Plex reachability) and `get_libraries` (sum of active movie-library counts). It does not request users, history, sessions, or private artwork. Duplicate movies in separate libraries count once per library entry. Counts reflect Tautulli's stored library inventory; they can lag behind Plex until Tautulli updates.
+
+Set `CINEVAULT_DATA_MODE=tautulli`, `TAUTULLI_URL`, and `TAUTULLI_API_KEY` at runtime to enable. Tautulli 2.18+ is required for header authentication. No browser receives these settings. Five-second request timeouts, rejected redirects, validation, and a 30-second in-process cache limit upstream traffic. Refresh the page to update; no automatic polling is enabled. Each replica maintains its own cache.
+
+Failures show **Unavailable** / **—**, never a substituted demo count. A failed identity check does not prove Plex is offline, so the UI does not claim that it is. Live mode omits the simulated active-stream count. Watch-time totals, recent screenings, rankings, and Most Watched remain clearly marked fictional demo analytics until consent is implemented.
+
+See [runtime setup](docs/TAUTULLI.md). No live credentials are included in the repository or container image.
