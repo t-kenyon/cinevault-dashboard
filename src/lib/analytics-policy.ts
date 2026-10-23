@@ -8,13 +8,13 @@ function count(v: unknown): number | undefined {
   if (typeof v === "string" && !/^\d+$/.test(v)) return;
   const n=Number(v); return Number.isSafeInteger(n) && n>=0 ? n : undefined;
 }
-export function safeUsers(data: unknown, consents: MemberConsent[]): SafeUser[] {
+export function safeUsers(data: unknown, consents: MemberConsent[], publicUrl?: string): SafeUser[] {
   if (!Array.isArray(data)) throw Error("Unavailable");
   const result: SafeUser[]=[];
   for (const user of data) {
     if (!obj(user) || !consents.some(c=>c.userId === String(user.user_id))) continue;
     if (![1,"1",true].includes(user.is_active as never)) continue;
-    const identity=publicPlexIdentity(user);
+    const identity=publicPlexIdentity(user, publicUrl);
     if (identity) result.push({userId:String(user.user_id),...identity});
   }
   return result;

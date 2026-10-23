@@ -11,3 +11,4 @@ coverage/
 # Private member consent records must never be published.
 private/
 consent*.json
+/member-photos/

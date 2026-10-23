@@ -3,6 +3,8 @@ import { createHmac } from "node:crypto";
 import { readMemberConsents } from "./consent";
 import { permits } from "./consent-policy";
 import { fetchPlexAvatar } from "./plex-avatar";
+import { memberPhotoFilename } from "./member-photo-policy";
+import { memberPhotoNotFound, readHostedMemberPhoto } from "./hosted-member-photo";
 import { safeUsers, normalizePlay, calculateAnalytics, type SafePlay } from "./analytics-policy";
 
 export type PublicMember = {id:string;name:string;color:string;minutes:number;completed:number;photo?:string};
@@ -64,7 +66,7 @@ export async function memberAnalytics():Promise<MemberAnalytics> {
     const consents=(await readMemberConsents()).filter(c=>(["rankings","screenings","aggregates"] as const).some(p=>permits(c,p,now,p==="screenings"?now:undefined)));
     if(consents.length>200)throw Error("Unavailable");
     if(!consents.length)return {...empty,state:"live"};
-    const users=safeUsers(await api("get_users"),consents);
+    const users=safeUsers(await api("get_users"),consents,process.env.CINEVAULT_PUBLIC_URL);
     const plays:SafePlay[]=[];
     // Batches limit concurrent history requests to three members.
     for(let i=0;i<users.length;i+=3){
@@ -93,6 +95,7 @@ export async function approvedArtwork(kind:string,id:string):Promise<Response> {
   const asset=analytics.state==="live" ? analytics.assets.get(id) : undefined;
   const headers={"Cache-Control":"private, no-store, max-age=0","X-Content-Type-Options":"nosniff"};
   if(!asset || asset.kind!==kind)return new Response(null,{status:404,headers});
+  if(asset.kind==="member" && memberPhotoFilename(asset.url))return readHostedMemberPhoto(asset.url);
   try {
     let url:URL;let requestHeaders:Record<string,string>={};
     if(asset.kind==="member")url=new URL(asset.url);
@@ -114,4 +117,14 @@ export async function approvedArtwork(kind:string,id:string):Promise<Response> {
     while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>5_000_000){await reader.cancel();throw Error();}chunks.push(value);}
     return new Response(Buffer.concat(chunks),{headers:{...headers,"Content-Type":type!}});
   } catch{return new Response(null,{status:404,headers});}
+}
+
+export async function approvedHostedMemberPhoto(filename: string): Promise<Response> {
+  const path = `/member-photos/${filename}`;
+  if (!memberPhotoFilename(path)) return memberPhotoNotFound();
+  const analytics = await memberAnalytics();
+  if (analytics.state !== "live" || ![...analytics.assets.values()].some(asset => asset.kind === "member" && asset.url === path)) {
+    return memberPhotoNotFound();
+  }
+  return readHostedMemberPhoto(path);
 }

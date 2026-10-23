@@ -66,6 +66,10 @@ See [runtime setup](docs/TAUTULLI.md). No live credentials are included in the r
 
 ## Consented live member analytics
 
-Optional live member analytics use private, explicit Tautulli user-ID consent records with three independent permissions. Initial consent date: October 23, 2026, midnight Pacific, as approved by the owner. Plex usernames/avatars are public only for the permitted sections; emails are excluded. Recent screenings start after consent; rankings and aggregates can use opted-in historical plays. Future members default to excluded. [Enrollment, revocation, data definitions, and limits](docs/MEMBER-CONSENT.md).
+Optional live member analytics use private, explicit Tautulli user-ID consent records with three independent permissions. Initial consent date: October 23, 2026, midnight Pacific, as approved by the owner. Member display names/avatars are public only for the permitted sections; emails are excluded. Display names prefer Tautulli Friendly Name with the Plex username as fallback. Recent screenings start after consent; rankings and aggregates can use opted-in historical plays. Future members default to excluded. [Enrollment, revocation, data definitions, and limits](docs/MEMBER-CONSENT.md).
 
 Enable only with `CINEVAULT_MEMBER_ANALYTICS=1` and a private read-only `CINEVAULT_CONSENT_FILE` mount. Never put the consent file into the source checkout or public assets.
+
+## Custom member photos
+
+Self-host profile images in a persistent, read-only runtime folder and use HTTPS dashboard URLs in Tautulli’s custom avatar setting. Photo routes check current member consent before returning image bytes, including direct requests to the configured URL. No personal photos belong in Git or the Docker image. See [photo hosting and updates](docs/MEMBER-PHOTOS.md).

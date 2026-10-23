@@ -27,12 +27,19 @@ test("withdrawal denies previously authorized sections",()=>{
 test("duplicate IDs, invalid times, string flags, and wildcard grants fail closed",()=>{
  for(const members of [[member,member],[{...member,consentedAt:"today"}],[{...member,rankings:"yes"}],[{...member,userId:"*"}]]) assert.throws(()=>parseConsentConfig({version:1,members}));
 });
-test("public identity uses Plex username only and excludes email and private image URLs",()=>{
+test("public identity falls back to Plex username and excludes email and private image URLs",()=>{
  assert.equal(publicPlexIdentity({email:"private@example.com",friendly_name:"Private"}),undefined);
  assert.equal(publicPlexIdentity({username:"private@example.com"}),undefined);
  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",email:"private@example.com",thumb:"http://192.168.0.99/avatar?token=secret"}),{name:"MovieFriend"});
  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:"https://plex.tv/users/fictional/avatar"}),{name:"MovieFriend",photo:"https://plex.tv/users/fictional/avatar"});
  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:"https://plex.tv/users/fictional/avatar?X-Plex-Token=secret"}),{name:"MovieFriend",photo:"https://plex.tv/users/fictional/avatar"});
+});
+test("friendly names take precedence without changing account identity or exposing emails",()=>{
+ assert.deepEqual(publicPlexIdentity({username:"MovieFriend",friendly_name:"  Cinema Friend  "}),{name:"Cinema Friend"});
+ for (const friendly_name of ["", "  ", "private@example.com", "bad\nname", "x".repeat(101), null]) {
+  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",friendly_name}),{name:"MovieFriend"});
+ }
+ assert.equal(publicPlexIdentity({username:"private@example.com",friendly_name:"Friend"}),undefined);
 });
 test("Plex avatar queries are stripped while unapproved sources remain excluded",()=>{
  const clean="https://plex.tv/users/fictional/avatar";

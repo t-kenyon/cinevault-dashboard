@@ -1,3 +1,5 @@
+import { hostedMemberPhotoPath } from "./member-photo-policy.ts";
+
 export type ConsentPermission = "rankings" | "screenings" | "aggregates";
 export type MemberConsent = {
   userId: string;
@@ -35,11 +37,13 @@ export function permits(member: MemberConsent | undefined, permission: ConsentPe
   return Number.isFinite(start) && start >= consent && start >= time - 30 * 86400000 && start <= time;
 }
 
-// Never substitute friendly names or emails for a missing Plex username.
-export function publicPlexIdentity(user: unknown): PublicIdentity | undefined {
+// A valid Plex username remains required; owner-configured friendly names take precedence.
+export function publicPlexIdentity(user: unknown, publicUrl?: string): PublicIdentity | undefined {
   if (!object(user) || typeof user.username !== "string") return;
-  const name = user.username.trim();
-  if (!name || name.length > 100 || /[@\u0000-\u001f\u007f]/.test(name)) return;
+  const username = user.username.trim();
+  if (!username || username.length > 100 || /[@\u0000-\u001f\u007f]/.test(username)) return;
+  const friendly = typeof user.friendly_name === "string" ? user.friendly_name.trim() : "";
+  const name = friendly && friendly.length <= 100 && !/[@\u0000-\u001f\u007f]/.test(friendly) ? friendly : username;
   let photo: string | undefined;
   if (typeof user.thumb === "string") {
     try {
@@ -51,5 +55,6 @@ export function publicPlexIdentity(user: unknown): PublicIdentity | undefined {
       }
     } catch { /* Unsupported images use initials. */ }
   }
+  if (!photo && typeof user.thumb === "string") photo = hostedMemberPhotoPath(user.thumb, publicUrl);
   return {name, ...(photo ? {photo} : {})};
 }

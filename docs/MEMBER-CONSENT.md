@@ -1,10 +1,10 @@
 # Live member analytics and private consent
 
-The owner confirmed that current members consented to three independent public uses, including Plex usernames and profile photos. Consent date for the initial enrollment is **October 23, 2026, 00:00 Pacific** (`2026-10-23T00:00:00-07:00`). This approval does not enroll future members automatically.
+The owner confirmed that current members consented to three independent public uses, including member display names and profile photos. Display names use the owner-configured Tautulli Friendly Name when valid, with the Plex username as fallback. Consent date for the initial enrollment is **October 23, 2026, 00:00 Pacific** (`2026-10-23T00:00:00-07:00`). This approval does not enroll future members automatically.
 
 ## Permissions
 
-- `rankings`: all recorded movie watch time and completed movie counts, with Plex username/avatar.
+- `rankings`: all recorded movie watch time and completed movie counts, with the member display name/avatar.
 - `screenings`: only completed movies started on/after consent, within the rolling 30 days, with username/avatar. Movies started before consent do not appear even if completed afterward.
 - `aggregates`: contributions to total movie watch time, completed-play total, and Most Watched. Most Watched uses completed plays only, including historical completed plays when aggregate permission is enabled.
 
@@ -36,7 +36,7 @@ Consent changes re-filter history already cached in memory. Page responses and a
 
 ## Public data boundary
 
-Only Plex usernames are used; friendly names and email addresses are never fallback names. Missing/email-like usernames are excluded. Avatar source URLs are restricted to approved HTTPS Plex avatar paths with no embedded credentials. Query parameters are stripped before fetching, so cache parameters do not hide valid avatars and tokens are never forwarded. Unsupported/missing images use initials. Artwork is delivered through same-origin routes with opaque HMAC-derived IDs. Movie artwork uses the server-side Tautulli image proxy. Unknown/unapproved asset IDs return 404. Avatar redirects are checked manually and may only lead to HTTPS assets.plex.tv, with at most two redirects and no authentication headers. Poster redirects and non-raster content are rejected, and images are capped at 5 MB. Artwork bypasses Next image optimization caches so withdrawal is checked on each future request.
+The owner-configured Tautulli Friendly Name is preferred, with the Plex username as fallback. Names must be nonempty, no more than 100 characters, and contain no control characters or @ sign. A valid non-email Plex username remains required; email fields are never used. Avatar source URLs are restricted to approved HTTPS Plex avatar paths with no embedded credentials. Query parameters are stripped before fetching, so cache parameters do not hide valid avatars and tokens are never forwarded. Custom photo URLs may also point to the configured public dashboard origin under /member-photos/; those files are read from a separate runtime mount, never fetched from arbitrary external hosts. Unsupported/missing images use initials. See [custom photo hosting](MEMBER-PHOTOS.md). Artwork is delivered through same-origin routes with opaque HMAC-derived IDs. Movie artwork uses the server-side Tautulli image proxy. Unknown/unapproved asset IDs return 404. Avatar redirects are checked manually and may only lead to HTTPS assets.plex.tv, with at most two redirects and no authentication headers. Poster redirects and non-raster content are rejected, and images are capped at 5 MB. Artwork bypasses Next image optimization caches so withdrawal is checked on each future request.
 
 History is paginated per approved member, with three concurrent members, 10-second request timeouts, and a 60-second in-memory source cache. Consent itself is not cached. A member's history is capped at 5,000 rows; more than that, malformed/duplicate rows, changing pagination totals, or incomplete pages produce an Unavailable state rather than incomplete all-time totals. Only users permitted for a section contribute to that section. Screenings-only users are requested with a date bound as well as being filtered locally. No raw upstream response is sent to clients. No personal data or live consent file is stored in Git or the image.
 
