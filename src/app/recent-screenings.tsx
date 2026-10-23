@@ -11,7 +11,7 @@ function ScreeningTitle({title,year}: {title:string;year?:number}) {
   const validYear = releaseYear(year);
   const suffix = validYear ? ` (${validYear})` : "";
   const name = suffix && title.trimEnd().endsWith(suffix) ? title.trimEnd().slice(0,-suffix.length) : title;
-  return <h3>{name}{validYear && <> <span className="screening-year">({validYear})</span></>}</h3>;
+  return <><h3>{name}</h3><p className="screening-year">{validYear ?? ""}</p></>;
 }
 
 type Screening = {id:string; title:string; year?:number; poster?:string; name:string; photo?:string; date:string; relativeDate:string};
@@ -55,13 +55,14 @@ export function RecentScreenings({recent,initialNowPlaying,demo,unavailable}: {r
         <div className="screening-art"><div className="screening-poster"><MoviePoster src={play.poster} title={movieTitle(play.title,play.year)} large />
           <span className="now-playing-badge">{play.state === "paused" ? "Paused" : play.state === "buffering" ? "Buffering" : "Now Playing"}{demo ? " · Demo" : ""}</span>
         </div>
+        <div className="screening-status">
         {play.durationSeconds !== null && <progress className="playback-progress" value={play.positionSeconds} max={play.durationSeconds} aria-label={`Playback progress for ${play.title}`} />}
         {play.durationSeconds !== null && <p className="playback-remaining">{Math.ceil(Math.max(0,play.durationSeconds-play.positionSeconds)/60)} min remaining</p>}
-        </div>
+        </div></div>
         <ScreeningTitle title={play.title} year={play.year} />
-        <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name}</p>
+        <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span>{play.name}</span></p>
       </li>)}
-      {recent.map(play => <li key={play.id}><div className="screening-art"><MoviePoster src={play.poster} title={movieTitle(play.title,play.year)} large /></div><ScreeningTitle title={play.title} year={play.year} /><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name} · Completed</p><p><time dateTime={play.date}>{play.relativeDate}</time></p></li>)}
+      {recent.map(play => <li key={play.id}><div className="screening-art"><MoviePoster src={play.poster} title={movieTitle(play.title,play.year)} large /><div className="screening-status"><p className="screening-date"><time dateTime={play.date}>{play.relativeDate}</time></p></div></div><ScreeningTitle title={play.title} year={play.year} /><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span>{play.name}</span></p></li>)}
     </RecentScroller>
     {!demo && active.state === "unavailable" && <p className="note" role="status">Now Playing temporarily unavailable.</p>}
     {unavailable ? <p className="note">Recent screenings temporarily unavailable.</p> : !recent.length && !active.items.length && <p className="note">No completed screenings to share yet.</p>}
