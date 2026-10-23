@@ -32,5 +32,14 @@ test("public identity uses Plex username only and excludes email and private ima
  assert.equal(publicPlexIdentity({username:"private@example.com"}),undefined);
  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",email:"private@example.com",thumb:"http://192.168.0.99/avatar?token=secret"}),{name:"MovieFriend"});
  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:"https://plex.tv/users/fictional/avatar"}),{name:"MovieFriend",photo:"https://plex.tv/users/fictional/avatar"});
- assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:"https://plex.tv/users/fictional/avatar?X-Plex-Token=secret"}),{name:"MovieFriend"});
+ assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:"https://plex.tv/users/fictional/avatar?X-Plex-Token=secret"}),{name:"MovieFriend",photo:"https://plex.tv/users/fictional/avatar"});
+});
+test("Plex avatar queries are stripped while unapproved sources remain excluded",()=>{
+ const clean="https://plex.tv/users/fictional/avatar";
+ for(const query of ["?c=12345","?c=12345&X-Plex-Token=secret","?redirect=https%3A%2F%2Fexample.com"]) {
+  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb:clean+query}),{name:"MovieFriend",photo:clean});
+ }
+ for(const thumb of ["http://plex.tv/users/fictional/avatar?c=1","https://plex.tv.example.com/users/fictional/avatar?c=1","https://plex.tv:8443/users/fictional/avatar?c=1","https://secret@plex.tv/users/fictional/avatar?c=1","https://plex.tv/users/fictional/avatar?c=1#fragment","https://plex.tv/other?c=1"]) {
+  assert.deepEqual(publicPlexIdentity({username:"MovieFriend",thumb}),{name:"MovieFriend"});
+ }
 });

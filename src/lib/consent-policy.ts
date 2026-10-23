@@ -44,7 +44,11 @@ export function publicPlexIdentity(user: unknown): PublicIdentity | undefined {
   if (typeof user.thumb === "string") {
     try {
       const url = new URL(user.thumb);
-      if (url.protocol === "https:" && ["plex.tv","www.plex.tv"].includes(url.hostname) && /^\/users\/[^/]+\/avatar\/?$/.test(url.pathname) && !url.search && !url.hash && !url.username && !url.password && !url.port) photo = url.toString();
+      if (url.protocol === "https:" && ["plex.tv","www.plex.tv"].includes(url.hostname) && /^\/users\/[^/]+\/avatar\/?$/.test(url.pathname) && !url.hash && !url.username && !url.password && !url.port) {
+        // Fetch the public avatar endpoint without forwarding cache parameters or tokens.
+        url.search = "";
+        photo = url.toString();
+      }
     } catch { /* Unsupported images use initials. */ }
   }
   return {name, ...(photo ? {photo} : {})};
