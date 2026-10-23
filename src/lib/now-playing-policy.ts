@@ -1,14 +1,15 @@
+import { releaseYear } from "./movie-metadata.ts";
 import { permits, type MemberConsent } from "./consent-policy.ts";
 import type { SafeUser } from "./analytics-policy.ts";
 
 export type PlaybackState = "playing" | "paused" | "buffering";
 export type PublicNowPlaying = {
-  id: string; title: string; poster: string; name: string; photo?: string;
+  id: string; title: string; year?: number; poster: string; name: string; photo?: string;
   state: PlaybackState; positionSeconds: number; durationSeconds: number | null;
 };
 export type NowPlayingFeed = {state: "live" | "unavailable" | "demo"; items: PublicNowPlaying[]; checkedAt: string};
 type SafeSession = {
-  sessionKey: string; userId: string; movieId: string; title: string;
+  sessionKey: string; userId: string; movieId: string; title: string; year?: number;
   state: PlaybackState; positionSeconds: number; durationSeconds: number | null;
 };
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === "object" && !Array.isArray(value);
@@ -39,6 +40,7 @@ export function safeNowPlaying(data: unknown, users: SafeUser[], consents: Membe
     seen.add(unique);
     result.push({
       sessionKey: String(key), userId: String(userId), movieId: String(movieId), title: session.full_title.trim(),
+      ...(releaseYear(session.year) ? {year:releaseYear(session.year)} : {}),
       state: session.state as PlaybackState, positionSeconds: Math.floor(position / 1000),
       durationSeconds: duration && duration >= 1000 ? Math.floor(duration / 1000) : null,
     });
