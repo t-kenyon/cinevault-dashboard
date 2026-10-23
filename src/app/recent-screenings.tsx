@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { playbackTimestamp, type NowPlayingFeed } from "@/lib/now-playing-policy";
+import type { NowPlayingFeed } from "@/lib/now-playing-policy";
 import { MemberAvatar } from "./member-avatar";
 import { MoviePoster } from "./poster";
 import { RecentScroller } from "./recent-scroller";
@@ -42,15 +42,15 @@ export function RecentScreenings({recent,initialNowPlaying,demo,unavailable}: {r
   },[demo]);
 
   return <>
-    <RecentScroller demo={demo} hasNowPlaying={active.items.length > 0}>
+    <RecentScroller>
       {active.items.map(play => <li key={`live-${play.id}`} className="now-playing-card">
         <div className="screening-poster"><MoviePoster src={play.poster} title={play.title} large />
           <span className="now-playing-badge">{play.state === "paused" ? "Paused" : play.state === "buffering" ? "Buffering" : "Now Playing"}{demo ? " · Demo" : ""}</span>
         </div>
+        {play.durationSeconds !== null && <progress className="playback-progress" value={play.positionSeconds} max={play.durationSeconds} aria-label={`Playback progress for ${play.title}`} />}
         <h3>{play.title}</h3>
         <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name}</p>
-        <p className="playback-position"><span>{playbackTimestamp(play.positionSeconds)}</span>{play.durationSeconds !== null && <><span aria-hidden="true">/</span><span>{playbackTimestamp(play.durationSeconds)}</span></>}</p>
-        {play.durationSeconds !== null && <progress className="playback-progress" value={play.positionSeconds} max={play.durationSeconds} aria-label={`Playback progress for ${play.title}`} />}
+        {play.durationSeconds !== null && <p className="playback-remaining">{Math.ceil(Math.max(0,play.durationSeconds-play.positionSeconds)/60)} min remaining</p>}
       </li>)}
       {recent.map(play => <li key={play.id}><MoviePoster src={play.poster} title={play.title} large /><h3>{play.title}</h3><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name} · Completed</p><p><time dateTime={play.date}>{play.relativeDate}</time></p></li>)}
     </RecentScroller>
