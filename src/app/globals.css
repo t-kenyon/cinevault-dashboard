@@ -185,3 +185,9 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
  .recent-rail:has(.now-playing-card)>li:not(.now-playing-card){flex-basis:calc((100% - 8px)*.428571429)}
  .recent-rail>.now-playing-card{flex-basis:calc((100% - 8px)/1.75)}
 }
+
+.dot:not(.dot-unavailable){animation:online-glow 2.8s ease-in-out infinite}
+@keyframes online-glow{0%,100%{box-shadow:0 0 5px #a4c3a055,0 0 0 0 #a4c3a020}50%{box-shadow:0 0 14px #a4c3a0a0,0 0 0 5px #a4c3a010}}
+@media(prefers-reduced-motion:reduce){.dot:not(.dot-unavailable){animation:none;box-shadow:0 0 9px #a4c3a070}}
+.member-crown{width:17px;height:17px;flex:none;color:var(--accent);vertical-align:middle}
+@media(max-width:640px){.member-crown{width:14px;height:14px}}

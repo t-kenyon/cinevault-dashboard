@@ -1,0 +1,9 @@
+{
+  "name": "cinevault-fallback",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-10-23",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "cinevault-dashboard.com/*", "zone_name": "cinevault-dashboard.com" }
+  ]
+}
