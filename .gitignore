@@ -8,3 +8,6 @@ out/
 *.key
 .DS_Store
 coverage/
+# Private member consent records must never be published.
+private/
+consent*.json

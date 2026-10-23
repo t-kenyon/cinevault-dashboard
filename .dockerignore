@@ -6,3 +6,5 @@ node_modules
 *.key
 *.tsbuildinfo
 coverage
+private
+consent*.json

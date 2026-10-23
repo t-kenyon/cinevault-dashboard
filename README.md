@@ -1,6 +1,6 @@
 # CineVault Dashboard V1
 
-A Next.js + TypeScript + Tailwind dashboard with a black, charcoal, silver, and gold identity, the supplied CineVault logo, and locally hosted Roboto. **All members, viewing history, server status, stream counts, and inventory totals are fictional demo data.** Classic-film titles and posters are visual samples, not evidence of actual library membership. Plex and Tautulli are not connected yet.
+A Next.js + TypeScript + Tailwind dashboard with a black, charcoal, silver, and gold identity, the supplied CineVault logo, and locally hosted Roboto. **All members, viewing history, server status, stream counts, and inventory totals are fictional demo data.** Classic-film titles and posters are visual samples, not evidence of actual library membership. Live integrations are opt-in runtime settings; default mode is fictional.
 
 ## Run locally
 
@@ -63,3 +63,9 @@ Set `CINEVAULT_DATA_MODE=tautulli`, `TAUTULLI_URL`, and `TAUTULLI_API_KEY` at ru
 Failures show **Unavailable** / **—**, never a substituted demo count. A failed identity check does not prove Plex is offline, so the UI does not claim that it is. Live mode omits the simulated active-stream count. Watch-time totals, recent screenings, rankings, and Most Watched remain clearly marked fictional demo analytics until consent is implemented.
 
 See [runtime setup](docs/TAUTULLI.md). No live credentials are included in the repository or container image.
+
+## Consented live member analytics
+
+Optional live member analytics use private, explicit Tautulli user-ID consent records with three independent permissions. Initial consent date: October 23, 2026, midnight Pacific, as approved by the owner. Plex usernames/avatars are public only for the permitted sections; emails are excluded. Recent screenings start after consent; rankings and aggregates can use opted-in historical plays. Future members default to excluded. [Enrollment, revocation, data definitions, and limits](docs/MEMBER-CONSENT.md).
+
+Enable only with `CINEVAULT_MEMBER_ANALYTICS=1` and a private read-only `CINEVAULT_CONSENT_FILE` mount. Never put the consent file into the source checkout or public assets.
