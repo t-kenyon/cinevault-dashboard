@@ -49,3 +49,7 @@ Tautulli is already running. Confirm the dashboard host and network reachability
 Tautulli supports `X-Api-Key` headers in version 2.18.0 and newer; prefer headers to query-string credentials. Store URL and key only in the target host’s ignored `.env.local` or deployment secret storage. Never paste keys into a public issue or PR. See the [official API reference](https://github.com/Tautulli/Tautulli/wiki/Tautulli-API-Reference).
 
 Before enabling live mode, implement timeouts, validated/allowlisted responses, generic error messages, and an unavailable state rather than silently substituting demo numbers. Plex poster requests must be resolved server-side with credentials absent from browser URLs.
+
+## Unraid deployment
+
+KenyonVault can host the dashboard as a Docker container. The repository includes a multistage Dockerfile, loopback-default Compose configuration, and [Unraid deployment instructions](docs/UNRAID.md). Start in demo mode on the LAN. Docker is not available in the authoring environment, so the actual Linux image must still be built and verified on the target host.
