@@ -2,6 +2,7 @@ import "server-only";
 import { createHmac } from "node:crypto";
 import { readMemberConsents } from "./consent";
 import { permits } from "./consent-policy";
+import { fetchPlexAvatar } from "./plex-avatar";
 import { safeUsers, normalizePlay, calculateAnalytics, type SafePlay } from "./analytics-policy";
 
 export type PublicMember = {id:string;name:string;color:string;minutes:number;completed:number;photo?:string};
@@ -102,7 +103,9 @@ export async function approvedArtwork(kind:string,id:string):Promise<Response> {
       url.searchParams.set("width","400");url.searchParams.set("height","600");url.searchParams.set("fallback","poster");
       requestHeaders={"X-Api-Key":process.env.TAUTULLI_API_KEY!};
     }
-    const response=await fetch(url,{headers:requestHeaders,redirect:"error",cache:"no-store",signal:AbortSignal.timeout(10000)});
+    const response=asset.kind==="member"
+      ? await fetchPlexAvatar(asset.url)
+      : await fetch(url,{headers:requestHeaders,redirect:"error",cache:"no-store",signal:AbortSignal.timeout(10000)});
     const type=response.headers.get("content-type")?.split(";")[0];
     if(!response.ok || !["image/jpeg","image/png","image/webp"].includes(type ?? ""))throw Error();
     // Bound in-memory image size. Reject before buffering oversized responses.
