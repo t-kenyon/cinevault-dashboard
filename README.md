@@ -1,10 +1,10 @@
 # CineVault Dashboard V1
 
-A cinematic, responsive analytics dashboard built with Next.js App Router, TypeScript, and Tailwind CSS. **All viewers, viewing history, server status, stream counts, and library totals are fictional demo data. Real classic-film titles and poster artwork are used as visual samples, not as evidence of actual library membership.** No live Plex or Tautulli requests are made.
+A Next.js + TypeScript + Tailwind dashboard with a black, charcoal, silver, and gold identity, the supplied CineVault logo, and locally hosted Roboto. **All members, viewing history, server status, stream counts, and inventory totals are fictional demo data.** Classic-film titles and posters are visual samples, not evidence of actual library membership. Plex and Tautulli are not connected yet.
 
 ## Run locally
 
-Use Node.js 22.18+ and pnpm 11.25.0 (see packageManager).
+Use Node.js 22.18+ and pnpm 11.25.0.
 
 ```sh
 corepack enable
@@ -12,44 +12,40 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open http://localhost:3000. No environment variables are required. For production: `pnpm build` then `pnpm start`.
+Open http://localhost:3000. No credentials are required for the demo. Production: `pnpm build`, then `pnpm start`.
 
-Validation: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. GitHub Actions runs these checks on pushes and pull requests.
+Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. GitHub Actions runs these on pushes and pull requests.
 
-## V1 features
+## Current scope
 
-1. Simulated online server status.
-2. Simulated current active-stream count.
-3. Movie count, TV episode count, and available content hours (illustrative inventory totals).
-4. Aggregate watch hours and minutes, computed from demo plays.
-5. Completed movie plays, excluding partial plays.
-6. Watch-time leaderboard for participating demo viewers.
-7. All-time leaderboard only; time toggles have been removed. Legacy period query parameters have no effect.
-8. `/viewer/[id]` public demo profiles with totals and viewing trends; unknown or private IDs return 404.
-9. All fully completed playthroughs in the rolling 30 days ending at the demo snapshot, from separately opted-in demo viewers. A horizontal rail displays four movies at a time, with arrows, touch/trackpad scrolling, and keyboard access. Partial plays and future records are excluded.
-10. Top five movies ranked by plays (including partial plays), then watch time; View more reveals the remaining ranking, and View less collapses it.
-11. Recently Added has been removed by design revision. Recent viewing now uses a horizontal poster rail showing four movies at a time.
-12. Viewer profiles retain a seven-day activity chart. The weekly chart has been removed from the homepage.
+- Simulated server status and current stream count.
+- Centered overview totals: movies, total watch time, and completed movie plays.
+- **FROM THE VAULT / Recent Screenings:** completed, consented playthroughs during the rolling 30 days; four posters at a time, horizontal navigation, and relative day labels.
+- **THE FRONT ROW / Member Rankings:** all-time watch hours and completed movie counts. Five members initially; View all members expands the ranking when there are more than five participating members. Names do not link to profiles.
+- **THE VAULT’S FINEST / Most Watched:** five films initially; View more expands the full ranking. Counts and watch-time totals include only completed screenings, ranked by count then watch time.
+- Individual member profiles, TV episode summary, Recently Added, and activity charts are removed. No catalog, logins, requests, or admin notifications.
 
 ## Data definitions
 
-The demo is frozen at October 22, 2026, 12:00 UTC. This week begins Monday October 19; month and year use UTC calendar boundaries. The leaderboard, other totals, and profiles are all time. Viewer profile charts cover October 16–22. Watch time includes partial plays; completed movies counts completed play events, not unique titles. TV playback is not represented in the sample history. Inventory and current streams are illustrative independent fixtures. There is no polling or live status. Update `src/lib/sample.ts` to change fixtures; calculations use those same records.
+The demo is frozen at October 22, 2026, 12:00 UTC. Relative days and the rolling 30-day interval use that snapshot. Member rankings and overview totals are all time. Overview/member watch time includes partial plays, while completed movie counts exclude them. Most Watched excludes partial plays from both counts and watch time. Counts represent play events, not unique titles. Real integrations will need an explicit source completion threshold and time-zone policy.
 
-## Privacy and future integrations
+## Privacy and credentials
 
-- `src/lib/data.ts` is the server-only data entry point. Keep future Plex/Tautulli clients and credentials behind it; never import them into client components.
-- `.env*` is ignored except the placeholder-only `.env.example`. Never use `NEXT_PUBLIC_` for tokens, private service URLs, or personal viewing data. No credentials are required or supplied in V1.
-- The public repository must contain fictional fixtures only. Never commit real usernames, IDs, history, exports, screenshots, logs, or credentials.
-- Do not wire live data into these public routes without explicit consent for public profiles and separately for recent viewing activity. The sample permission flags illustrate separate choices; they are not a real consent store. Production requires durable consent records, withdrawal handling, and reviewed aggregate disclosure rules, including small-group privacy.
-- Private or unknown viewer IDs have the same unavailable response. Search indexing is discouraged through metadata, but this is not access control.
-- No live integration, catalog, login, request system, or admin notifications are included. Public deployment is suitable for this fictional demo only.
+- `src/lib/data.ts` is the server-only data entry point. Keep future service clients behind it.
+- `.env*` is ignored except the placeholder-only `.env.example`. Never use `NEXT_PUBLIC_` for credentials, private URLs, or viewing data.
+- Only fictional member/history fixtures belong in this public repository. Never commit real usernames, IDs, histories, exports, logs, or screenshots.
+- Sample `publicProfile` flags currently control participation in the public rankings; `shareActivity` separately controls inclusion in screenings. These illustrate permissions, not a durable consent system. Live personal analytics must stay disabled until explicit consent and withdrawal handling exist.
+- Removed profile URLs return 404. Search indexing is discouraged but this is not access control.
+- Public deployment is suitable for the fictional demo only until live-data visibility is reviewed.
 
-## Review increments
+## Assets
 
-The initial commit establishes project tooling; the following implementation adds fixtures, analytics, privacy filtering, routes, styling, tests, and CI. Future work can introduce server adapters and consent storage in separate reviewed changes.
+`public/brand/cinevault-logo-final.png` is the user-supplied logo. Roboto and its OFL license are in `src/app/fonts/`. Poster sources and attribution are in `public/posters/ATTRIBUTION.md`. Browser artwork requests stay local; the shared poster component has an unavailable-art fallback.
 
-## Poster art
+## Next integration phase
 
-Sample poster files and source links are in `public/posters/ATTRIBUTION.md`. Every movie appearance uses the shared `MoviePoster` component, with an unavailable-art fallback. No third-party poster requests are made by the browser.
+Tautulli is already running. Confirm the dashboard host and network reachability before configuring credentials. The first live increment should expose only approved server status and movie inventory totals, clearly distinguished from demo viewing analytics. Do not add member history, active title details, private artwork, or personal analytics in this step.
 
-Plex artwork is not connected: no local Plex URL/token or movie metadata mapping has been supplied. When connecting, resolve each approved movie's Plex thumbnail on the server and expose a same-origin artwork URL. Keep `X-Plex-Token` in server-side request headers; never include it in rendered image URLs or responses. Only approved movie IDs should be addressable, and public artwork disclosure should be reviewed with the live-data consent policy.
+Tautulli supports `X-Api-Key` headers in version 2.18.0 and newer; prefer headers to query-string credentials. Store URL and key only in the target host’s ignored `.env.local` or deployment secret storage. Never paste keys into a public issue or PR. See the [official API reference](https://github.com/Tautulli/Tautulli/wiki/Tautulli-API-Reference).
+
+Before enabling live mode, implement timeouts, validated/allowlisted responses, generic error messages, and an unavailable state rather than silently substituting demo numbers. Plex poster requests must be resolved server-side with credentials absent from browser URLs.

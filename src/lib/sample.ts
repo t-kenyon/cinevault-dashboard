@@ -11,10 +11,10 @@ export const movies = [
   { id: "phantom", title: "The Phantom of the Opera", year: 1925, minutes: 93, added: "2026-10-11", poster: "/posters/phantom.jpg" },
 ];
 export const viewers = [
-  { id: "alex", name: "Alex", color: "#d8ad70", publicProfile: true, shareActivity: true },
-  { id: "jordan", name: "Jordan", color: "#a3b7a4", publicProfile: true, shareActivity: true },
-  { id: "riley", name: "Riley", color: "#b6a2cf", publicProfile: true, shareActivity: false },
-  { id: "sam", name: "Sam", color: "#91b1d5", publicProfile: true, shareActivity: true },
+  { id: "alex", name: "Alex", color: "#dfb568", publicProfile: true, shareActivity: true },
+  { id: "jordan", name: "Jordan", color: "#c0c0c0", publicProfile: true, shareActivity: true },
+  { id: "riley", name: "Riley", color: "#a4a4a4", publicProfile: true, shareActivity: false },
+  { id: "sam", name: "Sam", color: "#d2c2a2", publicProfile: true, shareActivity: true },
   { id: "private", name: "Private demo viewer", color: "#aaa", publicProfile: false, shareActivity: false },
 ];
 export type Play = { viewerId: string; movieId: string; date: string; watchedMinutes: number; completed: boolean };
@@ -52,4 +52,12 @@ export function activity(items: Play[]) {
 export function daysAgo(date: string, asOf = snapshot) {
   const days = Math.max(0, Math.floor((Date.parse(asOf) - Date.parse(date)) / 86_400_000));
   return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
+}
+
+export function mostWatched(items: Play[] = plays) {
+  return movies.map(movie => {
+    const screenings = items.filter(play => play.movieId === movie.id && play.completed);
+    return { ...movie, count: screenings.length, minutes: summarize(screenings).minutes };
+  }).filter(movie => movie.count > 0)
+    .sort((a,b) => b.count - a.count || b.minutes - a.minutes || a.title.localeCompare(b.title));
 }

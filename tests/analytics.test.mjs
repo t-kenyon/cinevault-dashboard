@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { daysAgo, leaderboard, recentActivity, inPeriod, summarize, duration, plays, viewers, activity } from "../src/lib/sample.ts";
+import { mostWatched, daysAgo, leaderboard, recentActivity, inPeriod, summarize, duration, plays, viewers, activity } from "../src/lib/sample.ts";
 test("leaderboard honors period boundaries and excludes private members", () => {
   for (const period of ["week", "month", "year", "all"]) {
     const rows = leaderboard(period);
@@ -38,4 +38,16 @@ test("relative play labels handle today, singular, and plural days", () => {
  assert.equal(daysAgo("2026-10-22T10:00:00Z"), "Today");
  assert.equal(daysAgo("2026-10-21T12:00:00Z"), "1 day ago");
  assert.equal(daysAgo("2026-10-15T12:00:00Z"), "7 days ago");
+});
+
+test("most watched excludes partial plays from counts and watch time", () => {
+ const rows = mostWatched([
+  {viewerId:"alex", movieId:"general", date:"2026-10-20", watchedMinutes:78, completed:true},
+  {viewerId:"alex", movieId:"general", date:"2026-10-21", watchedMinutes:35, completed:false},
+  {viewerId:"alex", movieId:"charade", date:"2026-10-20", watchedMinutes:113, completed:true},
+  {viewerId:"alex", movieId:"house", date:"2026-10-20", watchedMinutes:35, completed:false},
+ ]);
+ assert.deepEqual(rows.map(({id,count,minutes}) => ({id,count,minutes})),[
+  {id:"charade",count:1,minutes:113},{id:"general",count:1,minutes:78}
+ ]);
 });
