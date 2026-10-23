@@ -9,8 +9,8 @@ import { safeUsers, normalizePlay, calculateAnalytics, type SafePlay, type SafeU
 import { safeNowPlaying, type NowPlayingFeed } from "./now-playing-policy";
 
 export type PublicMember = {id:string;name:string;color:string;minutes:number;completed:number;photo?:string};
-export type PublicFilm = {id:string;title:string;year?:number;poster:string;count:number;minutes:number};
-export type PublicScreening = {id:string;title:string;year?:number;poster:string;name:string;photo?:string;date:string};
+export type PublicFilm = {id:string;title:string;poster:string;count:number;minutes:number};
+export type PublicScreening = {id:string;title:string;poster:string;name:string;photo?:string;date:string};
 type Asset = {kind:"member";url:string} | {kind:"movie";ratingKey:string};
 export type MemberAnalytics = {state:"live"|"unavailable"|"demo";members:PublicMember[];recent:PublicScreening[];popular:PublicFilm[];minutes:number;completed:number;now:string;assets:Map<string,Asset>};
 const cache=new Map<string,{expires:number;value:Promise<unknown>}>();
@@ -92,8 +92,8 @@ export async function memberAnalytics():Promise<MemberAnalytics> {
     const result=calculateAnalytics(users,plays,consents,now);
     const {assets,photo,poster}=artworkFor(users);
     const members=result.members.map(user=>({id:assetId("public-member",user.userId),name:user.name,color:"#c0c0c0",minutes:user.minutes,completed:user.completed,photo:photo(user.userId)}));
-    const recent=result.recent.map(play=>({id:assetId("play",`${play.userId}:${play.id}`),title:play.title,year:play.year,poster:poster(play.movieId),name:users.find(u=>u.userId===play.userId)!.name,photo:photo(play.userId),date:play.stopped}));
-    const popular=result.popular.map(movie=>({id:assetId("public-film",movie.movieId),title:movie.title,year:movie.year,poster:poster(movie.movieId),count:movie.count,minutes:movie.minutes}));
+    const recent=result.recent.map(play=>({id:assetId("play",`${play.userId}:${play.id}`),title:play.title,poster:poster(play.movieId),name:users.find(u=>u.userId===play.userId)!.name,photo:photo(play.userId),date:play.stopped}));
+    const popular=result.popular.map(movie=>({id:assetId("public-film",movie.movieId),title:movie.title,poster:poster(movie.movieId),count:movie.count,minutes:movie.minutes}));
     return {state:"live",members,recent,popular,minutes:result.minutes,completed:result.completed,now,assets};
   } catch{return {...empty,state:"unavailable"};}
 }
@@ -110,7 +110,7 @@ export async function nowPlayingAnalytics(): Promise<NowPlayingFeed & {assets: M
     const sessions = safeNowPlaying(await api("get_activity"),users,consents,checkedAt);
     const {assets,photo,poster} = artworkFor(users);
     const items = sessions.map(session => ({
-      id:assetId("session",`${session.userId}:${session.sessionKey}`), title:session.title, year:session.year,
+      id:assetId("session",`${session.userId}:${session.sessionKey}`), title:session.title,
       poster:poster(session.movieId), name:users.find(user=>user.userId===session.userId)!.name,
       photo:photo(session.userId),state:session.state,positionSeconds:session.positionSeconds,durationSeconds:session.durationSeconds,
     }));
