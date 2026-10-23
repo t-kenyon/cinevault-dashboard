@@ -157,3 +157,15 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 .now-playing-card .movie-poster{border-color:var(--accent)}
 .recent-grid .playback-remaining{color:var(--accent);font-size:11px;font-variant-numeric:tabular-nums}
 @media(max-width:640px){.recent-grid .playback-remaining{font-size:10px}}
+
+/* Keep the active outline clear of artwork and text, with matching card spacing. */
+.recent-rail>li{padding:10px}
+.recent-rail .now-playing-card{padding:10px}
+/* Place navigation beside the heading instead of on a separate empty row. */
+.recent-viewing{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;row-gap:16px}
+.recent-viewing>.section-heading{margin:0;align-self:center}
+.recent-viewing>.section-heading h2{margin-bottom:0}
+.recent-viewing>.recent-controls{margin:0;align-self:center}
+.recent-viewing>.recent-rail,.recent-viewing>.note{grid-column:1/-1}
+@media(max-width:640px){.recent-rail>li,.recent-rail .now-playing-card{padding:6px}.recent-viewing{row-gap:12px}}
+@media(max-width:480px){.recent-rail{grid-auto-columns:calc((100% - 8px)/2)}.recent-rail .screening-member{flex-wrap:nowrap}}
