@@ -18,7 +18,7 @@ Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. GitHub Actions
 
 ## Current scope
 
-- Simulated server status and current stream count.
+- Server status and current stream count: fictional in demo mode, live via Tautulli when configured.
 - Centered overview totals: movies, total watch time, and completed movie plays.
 - **FROM THE VAULT / Recent Screenings:** completed, consented playthroughs during the rolling 30 days; four posters at a time, horizontal navigation, and relative day labels.
 - **THE FRONT ROW / Member Rankings:** all-time watch hours and completed movie counts. Five members initially; View all members expands the ranking when there are more than five participating members. Names do not link to profiles.
@@ -56,11 +56,11 @@ KenyonVault can host the dashboard as a Docker container. The repository include
 
 ## Live status and inventory via Tautulli
 
-The first live adapter requests only `get_server_identity` (Plex reachability) and `get_libraries` (sum of active movie-library counts). It does not request users, history, sessions, or private artwork. Duplicate movies in separate libraries count once per library entry. Counts reflect Tautulli's stored library inventory; they can lag behind Plex until Tautulli updates.
+The connection-summary adapter requests `get_server_identity` (Plex reachability), `get_libraries` (sum of active movie-library counts), and `get_activity` (server-wide session count only). It exposes no session details. Member analytics and artwork use the separate consent-controlled integration below. Duplicate movies in separate libraries count once per library entry. Counts reflect Tautulli's stored library inventory; they can lag behind Plex until Tautulli updates.
 
 Set `CINEVAULT_DATA_MODE=tautulli`, `TAUTULLI_URL`, and `TAUTULLI_API_KEY` at runtime to enable. Tautulli 2.18+ is required for header authentication. No browser receives these settings. Five-second request timeouts, rejected redirects, validation, and a 30-second in-process cache limit upstream traffic. Refresh the page to update; no automatic polling is enabled. Each replica maintains its own cache.
 
-Failures show **Unavailable** / **—**, never a substituted demo count. A failed identity check does not prove Plex is offline, so the UI does not claim that it is. Live mode omits the simulated active-stream count. Watch-time totals, recent screenings, rankings, and Most Watched remain clearly marked fictional demo analytics until consent is implemented.
+Failures show **Unavailable** / **—**, never a substituted demo count. A failed identity check does not prove Plex is offline, so the UI does not claim that it is. Live mode shows the validated Tautulli stream count, or `— unavailable` when activity cannot be read. The count includes paused sessions reported by Tautulli and all media types; it is independent of member ranking participation. Watch-time totals, recent screenings, rankings, and Most Watched remain clearly marked fictional demo analytics until consent is implemented.
 
 See [runtime setup](docs/TAUTULLI.md). No live credentials are included in the repository or container image.
 

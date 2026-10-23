@@ -3,6 +3,7 @@ export type ConnectionSummary = {
   source: "demo" | "tautulli";
   status: "online" | "unavailable";
   movieCount: number | null;
+  streamCount: number | null;
   checkedAt: string;
 };
 
@@ -18,12 +19,12 @@ function integer(value: unknown): number | null {
 }
 
 export async function readTautulliSummary(baseUrl: string, apiKey: string, request: Fetcher = fetch): Promise<ConnectionSummary> {
-  const result: ConnectionSummary = { source: "tautulli", status: "unavailable", movieCount: null, checkedAt: new Date().toISOString() };
+  const result: ConnectionSummary = { source: "tautulli", status: "unavailable", movieCount: null, streamCount: null, checkedAt: new Date().toISOString() };
   try {
     const base = new URL(baseUrl);
     if (!["http:","https:"].includes(base.protocol) || base.username || base.password || base.search || base.hash || !apiKey.trim()) return result;
     const endpoint = new URL(`${base.pathname.replace(/\/$/,"")}/api/v2`, base.origin);
-    async function call(command: "get_server_identity" | "get_libraries"): Promise<unknown> {
+    async function call(command: "get_server_identity" | "get_libraries" | "get_activity"): Promise<unknown> {
       const url = new URL(endpoint);
       url.searchParams.set("cmd", command);
       const response = await request(url.toString(), {
@@ -36,7 +37,7 @@ export async function readTautulliSummary(baseUrl: string, apiKey: string, reque
       if (!record(payload) || !record(payload.response) || payload.response.result !== "success") throw new Error("Service unavailable");
       return payload.response.data;
     }
-    const [identity, libraries] = await Promise.allSettled([call("get_server_identity"), call("get_libraries")]);
+    const [identity, libraries, activity] = await Promise.allSettled([call("get_server_identity"), call("get_libraries"), call("get_activity")]);
     if (identity.status === "fulfilled") {
       const info = Array.isArray(identity.value) ? identity.value[0] : identity.value;
       if (record(info) && typeof info.version === "string" && info.version.length > 0) result.status = "online";
@@ -52,6 +53,10 @@ export async function readTautulliSummary(baseUrl: string, apiKey: string, reque
         count += value;
       }
       if (valid) result.movieCount = count;
+    }
+    // Only the server-wide count leaves this module; session details stay private.
+    if (activity.status === "fulfilled" && record(activity.value)) {
+      result.streamCount = integer(activity.value.stream_count);
     }
   } catch { /* Configuration and transport failures expose no credentials or upstream details. */ }
   return result;
