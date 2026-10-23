@@ -1,11 +1,14 @@
 export type Period = "week" | "month" | "year" | "all";
 export const periods: Record<Period, string> = { week: "This week", month: "This month", year: "This year", all: "All time" };
 export const snapshot = "2026-10-22T12:00:00Z";
+// Real film titles and posters for visual demonstration; no real library or viewing data.
 export const movies = [
-  { id: "signal", title: "The Last Signal", year: 2026, minutes: 118, added: "2026-10-21", color: "signal" },
-  { id: "orbit", title: "Beyond the Orbit", year: 2025, minutes: 142, added: "2026-10-19", color: "orbit" },
-  { id: "summer", title: "An Endless Summer", year: 2026, minutes: 104, added: "2026-10-17", color: "summer" },
-  { id: "midnight", title: "Midnight in Motion", year: 2024, minutes: 96, added: "2026-10-15", color: "midnight" },
+  { id: "general", title: "The General", year: 1926, minutes: 78, added: "2026-10-21", poster: "/posters/general.png" },
+  { id: "charade", title: "Charade", year: 1963, minutes: 113, added: "2026-10-19", poster: "/posters/charade.jpg" },
+  { id: "house", title: "House on Haunted Hill", year: 1959, minutes: 75, added: "2026-10-17", poster: "/posters/house.jpg" },
+  { id: "night", title: "Night of the Living Dead", year: 1968, minutes: 96, added: "2026-10-15", poster: "/posters/night.jpg" },
+  { id: "friday", title: "His Girl Friday", year: 1940, minutes: 92, added: "2026-10-13", poster: "/posters/friday.jpg" },
+  { id: "phantom", title: "The Phantom of the Opera", year: 1925, minutes: 93, added: "2026-10-11", poster: "/posters/phantom.jpg" },
 ];
 export const viewers = [
   { id: "alex", name: "Alex", color: "#d8ad70", publicProfile: true, shareActivity: true },
@@ -30,10 +33,23 @@ export function summarize(items: Play[]) { return { minutes: items.reduce((n, p)
 export function leaderboard(period: Period) {
   return viewers.filter(v => v.publicProfile).map(viewer => ({ ...viewer, ...summarize(plays.filter(p => p.viewerId === viewer.id && inPeriod(p.date, period))) })).sort((a, b) => b.minutes - a.minutes || a.name.localeCompare(b.name));
 }
-export function recentActivity() { return plays.filter(p => viewers.some(v => v.id === p.viewerId && v.publicProfile && v.shareActivity)).sort((a,b) => b.date.localeCompare(a.date)).slice(0,4); }
+export function recentActivity(items: Play[] = plays, asOf = snapshot) {
+  const end = Date.parse(asOf);
+  const start = end - 30 * 24 * 60 * 60 * 1000;
+  return items.filter(p => {
+    const date = Date.parse(p.date);
+    return p.completed && date >= start && date <= end && viewers.some(v => v.id === p.viewerId && v.publicProfile && v.shareActivity);
+  }).sort((a,b) => b.date.localeCompare(a.date));
+}
+
 export function activity(items: Play[]) {
   return Array.from({ length: 7 }, (_, i) => {
     const day = new Date(Date.UTC(2026,9,16+i)).toISOString().slice(0,10);
     return { day, label: new Date(day + "T12:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), minutes: summarize(items.filter(p => p.date.startsWith(day))).minutes };
   });
+}
+
+export function daysAgo(date: string, asOf = snapshot) {
+  const days = Math.max(0, Math.floor((Date.parse(asOf) - Date.parse(date)) / 86_400_000));
+  return days === 0 ? "Today" : days === 1 ? "1 day ago" : `${days} days ago`;
 }

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { leaderboard, recentActivity, inPeriod, summarize, duration, plays, viewers, activity } from "../src/lib/sample.ts";
+import { daysAgo, leaderboard, recentActivity, inPeriod, summarize, duration, plays, viewers, activity } from "../src/lib/sample.ts";
 test("leaderboard honors period boundaries and excludes private members", () => {
   for (const period of ["week", "month", "year", "all"]) {
     const rows = leaderboard(period);
@@ -21,4 +21,21 @@ test("partial plays add time without counting as completed movies", () => {
  assert.equal(duration(153), "2h 33m");
  assert.equal(activity([]).length,7);
  assert.ok(activity([]).every(p => p.minutes === 0));
+});
+
+test("recent activity includes all completed, consented plays in the rolling 30 days", () => {
+ const asOf = "2026-10-22T12:00:00Z";
+ const start = Date.parse(asOf) - 30*24*60*60*1000;
+ const expected = plays.filter(p => p.completed && Date.parse(p.date) >= start && Date.parse(p.date) <= Date.parse(asOf) && viewers.some(v => v.id === p.viewerId && v.publicProfile && v.shareActivity)).sort((a,b) => b.date.localeCompare(a.date));
+ assert.deepEqual(recentActivity(),expected);
+ assert.ok(recentActivity().length > 4);
+ const base = { viewerId:"alex", movieId:"general", completed:true, watchedMinutes:78 };
+ const dates = ["2026-09-22T11:59:59Z", "2026-09-22T12:00:00Z", asOf, "2026-10-22T12:00:01Z"];
+ assert.deepEqual(recentActivity(dates.map(date => ({ ...base, date })),asOf).map(p => p.date),[asOf,dates[1]]);
+});
+
+test("relative play labels handle today, singular, and plural days", () => {
+ assert.equal(daysAgo("2026-10-22T10:00:00Z"), "Today");
+ assert.equal(daysAgo("2026-10-21T12:00:00Z"), "1 day ago");
+ assert.equal(daysAgo("2026-10-15T12:00:00Z"), "7 days ago");
 });

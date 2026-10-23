@@ -1,6 +1,6 @@
 # CineVault Dashboard V1
 
-A cinematic, responsive analytics dashboard built with Next.js App Router, TypeScript, and Tailwind CSS. **All viewers, viewing history, titles, server status, stream counts, and library totals are fictional demo data.** No live Plex or Tautulli requests are made.
+A cinematic, responsive analytics dashboard built with Next.js App Router, TypeScript, and Tailwind CSS. **All viewers, viewing history, server status, stream counts, and library totals are fictional demo data. Real classic-film titles and poster artwork are used as visual samples, not as evidence of actual library membership.** No live Plex or Tautulli requests are made.
 
 ## Run locally
 
@@ -24,16 +24,16 @@ Validation: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. GitHub Act
 4. Aggregate watch hours and minutes, computed from demo plays.
 5. Completed movie plays, excluding partial plays.
 6. Watch-time leaderboard for participating demo viewers.
-7. This week, month, year, and all-time leaderboard filters through shareable URL parameters.
+7. All-time leaderboard only; time toggles have been removed. Legacy period query parameters have no effect.
 8. `/viewer/[id]` public demo profiles with totals and viewing trends; unknown or private IDs return 404.
-9. Recent viewing with separately opted-in demo viewers only.
-10. Popular movies ranked by plays (including partial plays), then watch time; both totals displayed.
-11. Recently added fictional movies in descending added-date order; display only, no catalog or detail navigation.
-12. Seven-day streaming activity chart with an accessible text description.
+9. All fully completed playthroughs in the rolling 30 days ending at the demo snapshot, from separately opted-in demo viewers. A horizontal rail displays four movies at a time, with arrows, touch/trackpad scrolling, and keyboard access. Partial plays and future records are excluded.
+10. Top five movies ranked by plays (including partial plays), then watch time; View more reveals the remaining ranking, and View less collapses it.
+11. Recently Added has been removed by design revision. Recent viewing now uses a horizontal poster rail showing four movies at a time.
+12. Viewer profiles retain a seven-day activity chart. The weekly chart has been removed from the homepage.
 
 ## Data definitions
 
-The demo is frozen at October 22, 2026, 12:00 UTC. This week begins Monday October 19; month and year use UTC calendar boundaries. Filters apply to the leaderboard only; other totals and profiles are all time, and charts cover October 16–22. Watch time includes partial plays; completed movies counts completed play events, not unique titles. TV playback is not represented in the sample history. Inventory and current streams are illustrative independent fixtures. There is no polling or live status. Update `src/lib/sample.ts` to change fixtures; calculations use those same records.
+The demo is frozen at October 22, 2026, 12:00 UTC. This week begins Monday October 19; month and year use UTC calendar boundaries. The leaderboard, other totals, and profiles are all time. Viewer profile charts cover October 16–22. Watch time includes partial plays; completed movies counts completed play events, not unique titles. TV playback is not represented in the sample history. Inventory and current streams are illustrative independent fixtures. There is no polling or live status. Update `src/lib/sample.ts` to change fixtures; calculations use those same records.
 
 ## Privacy and future integrations
 
@@ -47,3 +47,9 @@ The demo is frozen at October 22, 2026, 12:00 UTC. This week begins Monday Octob
 ## Review increments
 
 The initial commit establishes project tooling; the following implementation adds fixtures, analytics, privacy filtering, routes, styling, tests, and CI. Future work can introduce server adapters and consent storage in separate reviewed changes.
+
+## Poster art
+
+Sample poster files and source links are in `public/posters/ATTRIBUTION.md`. Every movie appearance uses the shared `MoviePoster` component, with an unavailable-art fallback. No third-party poster requests are made by the browser.
+
+Plex artwork is not connected: no local Plex URL/token or movie metadata mapping has been supplied. When connecting, resolve each approved movie's Plex thumbnail on the server and expose a same-origin artwork URL. Keep `X-Plex-Token` in server-side request headers; never include it in rendered image URLs or responses. Only approved movie IDs should be addressable, and public artwork disclosure should be reviewed with the live-data consent policy.
