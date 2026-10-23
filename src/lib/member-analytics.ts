@@ -5,7 +5,8 @@ import { permits } from "./consent-policy";
 import { fetchPlexAvatar } from "./plex-avatar";
 import { memberPhotoFilename } from "./member-photo-policy";
 import { memberPhotoNotFound, readHostedMemberPhoto } from "./hosted-member-photo";
-import { safeUsers, normalizePlay, calculateAnalytics, type SafePlay } from "./analytics-policy";
+import { safeUsers, normalizePlay, calculateAnalytics, type SafePlay, type SafeUser } from "./analytics-policy";
+import { safeNowPlaying, type NowPlayingFeed } from "./now-playing-policy";
 
 export type PublicMember = {id:string;name:string;color:string;minutes:number;completed:number;photo?:string};
 export type PublicFilm = {id:string;title:string;poster:string;count:number;minutes:number};
@@ -13,7 +14,7 @@ export type PublicScreening = {id:string;title:string;poster:string;name:string;
 type Asset = {kind:"member";url:string} | {kind:"movie";ratingKey:string};
 export type MemberAnalytics = {state:"live"|"unavailable"|"demo";members:PublicMember[];recent:PublicScreening[];popular:PublicFilm[];minutes:number;completed:number;now:string;assets:Map<string,Asset>};
 const cache=new Map<string,{expires:number;value:Promise<unknown>}>();
-async function api(command: "get_users"|"get_history", parameters: Record<string,string> = {}):Promise<unknown> {
+async function api(command: "get_users"|"get_history"|"get_activity", parameters: Record<string,string> = {}):Promise<unknown> {
   const base=new URL(process.env.TAUTULLI_URL ?? "");
   if (!["http:","https:"].includes(base.protocol) || base.username || base.password || base.search || base.hash || !process.env.TAUTULLI_API_KEY?.trim()) throw Error("Unavailable");
   const url=new URL(`${base.pathname.replace(/\/$/,"")}/api/v2`,base.origin);
@@ -30,11 +31,22 @@ async function api(command: "get_users"|"get_history", parameters: Record<string
     if(payload?.response?.result!=="success")throw Error("Unavailable");
     return payload.response.data;
   })();
-  cache.set(key,{expires:Date.now()+60000,value});
+  cache.set(key,{expires:Date.now()+(command==="get_activity" ? 10000 : 60000),value});
   try{return await value;}catch{cache.delete(key);throw Error("Unavailable");}
 }
 function assetId(kind:string,id:string):string {
   return createHmac("sha256",process.env.TAUTULLI_API_KEY!).update(`${kind}:${id}`).digest("hex").slice(0,32);
+}
+function artworkFor(users: SafeUser[]) {
+  const assets = new Map<string,Asset>();
+  function photo(userId: string) {
+    const user = users.find(u => u.userId === userId); if (!user?.photo) return;
+    const id = assetId("member", userId); assets.set(id,{kind:"member",url:user.photo}); return `/artwork/member/${id}`;
+  }
+  function poster(movieId: string) {
+    const id = assetId("movie",movieId); assets.set(id,{kind:"movie",ratingKey:movieId}); return `/artwork/movie/${id}`;
+  }
+  return {assets, photo, poster};
 }
 async function history(userId:string,after?:string):Promise<SafePlay[]> {
   const result:SafePlay[]=[];const seen=new Set<string>();let total:number|undefined;
@@ -78,21 +90,37 @@ export async function memberAnalytics():Promise<MemberAnalytics> {
       }));plays.push(...batches.flat());
     }
     const result=calculateAnalytics(users,plays,consents,now);
-    const assets=new Map<string,Asset>();
-    function photo(userId:string){
-      const user=users.find(u=>u.userId===userId);if(!user?.photo)return;
-      const id=assetId("member",userId);assets.set(id,{kind:"member",url:user.photo});return `/artwork/member/${id}`;
-    }
-    function poster(movieId:string){const id=assetId("movie",movieId);assets.set(id,{kind:"movie",ratingKey:movieId});return `/artwork/movie/${id}`;}
+    const {assets,photo,poster}=artworkFor(users);
     const members=result.members.map(user=>({id:assetId("public-member",user.userId),name:user.name,color:"#c0c0c0",minutes:user.minutes,completed:user.completed,photo:photo(user.userId)}));
     const recent=result.recent.map(play=>({id:assetId("play",`${play.userId}:${play.id}`),title:play.title,poster:poster(play.movieId),name:users.find(u=>u.userId===play.userId)!.name,photo:photo(play.userId),date:play.stopped}));
     const popular=result.popular.map(movie=>({id:assetId("public-film",movie.movieId),title:movie.title,poster:poster(movie.movieId),count:movie.count,minutes:movie.minutes}));
     return {state:"live",members,recent,popular,minutes:result.minutes,completed:result.completed,now,assets};
   } catch{return {...empty,state:"unavailable"};}
 }
+
+export async function nowPlayingAnalytics(): Promise<NowPlayingFeed & {assets: Map<string,Asset>}> {
+  const checkedAt = new Date().toISOString();
+  const empty: NowPlayingFeed & {assets: Map<string,Asset>} = {state:"demo",items:[],checkedAt,assets:new Map()};
+  if (process.env.CINEVAULT_DATA_MODE !== "tautulli" || process.env.CINEVAULT_MEMBER_ANALYTICS !== "1") return empty;
+  try {
+    const consents = (await readMemberConsents()).filter(c => permits(c,"screenings",checkedAt,checkedAt));
+    if (consents.length > 200) throw Error("Unavailable");
+    if (!consents.length) return {...empty,state:"live"};
+    const users = safeUsers(await api("get_users"),consents,process.env.CINEVAULT_PUBLIC_URL);
+    const sessions = safeNowPlaying(await api("get_activity"),users,consents,checkedAt);
+    const {assets,photo,poster} = artworkFor(users);
+    const items = sessions.map(session => ({
+      id:assetId("session",`${session.userId}:${session.sessionKey}`), title:session.title,
+      poster:poster(session.movieId), name:users.find(user=>user.userId===session.userId)!.name,
+      photo:photo(session.userId),state:session.state,positionSeconds:session.positionSeconds,durationSeconds:session.durationSeconds,
+    }));
+    return {state:"live",items,checkedAt,assets};
+  } catch { return {...empty,state:"unavailable"}; }
+}
+
 export async function approvedArtwork(kind:string,id:string):Promise<Response> {
-  const analytics=await memberAnalytics();
-  const asset=analytics.state==="live" ? analytics.assets.get(id) : undefined;
+  const [analytics,active]=await Promise.all([memberAnalytics(),nowPlayingAnalytics()]);
+  const asset=(analytics.state==="live" ? analytics.assets.get(id) : undefined) ?? (active.state==="live" ? active.assets.get(id) : undefined);
   const headers={"Cache-Control":"private, no-store, max-age=0","X-Content-Type-Options":"nosniff"};
   if(!asset || asset.kind!==kind)return new Response(null,{status:404,headers});
   if(asset.kind==="member" && memberPhotoFilename(asset.url))return readHostedMemberPhoto(asset.url);
@@ -122,8 +150,8 @@ export async function approvedArtwork(kind:string,id:string):Promise<Response> {
 export async function approvedHostedMemberPhoto(filename: string): Promise<Response> {
   const path = `/member-photos/${filename}`;
   if (!memberPhotoFilename(path)) return memberPhotoNotFound();
-  const analytics = await memberAnalytics();
-  if (analytics.state !== "live" || ![...analytics.assets.values()].some(asset => asset.kind === "member" && asset.url === path)) {
+  const sources = await Promise.all([memberAnalytics(),nowPlayingAnalytics()]);
+  if (!sources.some(source => source.state === "live" && [...source.assets.values()].some(asset => asset.kind === "member" && asset.url === path))) {
     return memberPhotoNotFound();
   }
   return readHostedMemberPhoto(path);

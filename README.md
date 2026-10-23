@@ -20,7 +20,7 @@ Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`. GitHub Actions
 
 - Server status and current stream count: fictional in demo mode, live via Tautulli when configured.
 - Centered overview totals: movies, total watch time, and completed movie plays.
-- **FROM THE VAULT / Recent Screenings:** completed, consented playthroughs during the rolling 30 days; four posters at a time, horizontal navigation, and relative day labels.
+- **FROM THE VAULT / Recent Screenings:** consented active movies first, with member identity and playback timestamps, followed by completed playthroughs during the rolling 30 days; four posters at a time with horizontal navigation. Active playback refreshes every 15 seconds while the page is visible. [Behavior and privacy](docs/NOW-PLAYING.md).
 - **THE FRONT ROW / Member Rankings:** all-time watch hours and completed movie counts. Five members initially; View all members expands the ranking when there are more than five participating members. Names do not link to profiles.
 - **THE VAULT’S FINEST / Most Watched:** five films initially; View more expands the full ranking. Counts and watch-time totals include only completed screenings, ranked by count then watch time.
 - Individual member profiles, TV episode summary, Recently Added, and activity charts are removed. No catalog, logins, requests, or admin notifications.

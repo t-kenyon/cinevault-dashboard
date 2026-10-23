@@ -5,7 +5,7 @@ The owner confirmed that current members consented to three independent public u
 ## Permissions
 
 - `rankings`: all recorded movie watch time and completed movie counts, with the member display name/avatar.
-- `screenings`: only completed movies started on/after consent, within the rolling 30 days, with username/avatar. Movies started before consent do not appear even if completed afterward.
+- `screenings`: completed movies started on/after consent, within the rolling 30 days, with display name/avatar. Movies started before consent do not appear as completed screenings even if completed afterward. This permission also controls identified live movie sessions in Now Playing, evaluated at observation time after consent. See [live-session rules](NOW-PLAYING.md).
 - `aggregates`: contributions to total movie watch time, completed-play total, and Most Watched. Most Watched uses completed plays only, including historical completed plays when aggregate permission is enabled.
 
 Completed means Tautulli's `watched_status=1`; the configured Tautulli watched threshold determines this designation. History is requested with movie-only filtering, grouping off, and current activity excluded. Actual recorded playback seconds are used; paused time is not inferred from movie runtime. Ranking/overview watch time includes partial recorded movie plays, but screening lists and Most Watched exclude them.

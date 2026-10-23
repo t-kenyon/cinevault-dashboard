@@ -25,6 +25,6 @@ Reference: https://github.com/Tautulli/Tautulli/wiki/Tautulli-API-Reference
 
 ## Currently streaming
 
-The server requests `get_activity` and keeps only its validated, nonnegative integer `stream_count`. This is Tautulli’s server-wide session count across media types, including sessions Tautulli reports as paused; it is not a count of unique members or just completed movies. It is independent of member ranking participation. Session titles, usernames, devices, IP addresses, and raw session objects are never returned to the browser or logged by this adapter.
+The server requests `get_activity` and keeps only its validated, nonnegative integer `stream_count`. This is Tautulli’s server-wide session count across media types, including sessions Tautulli reports as paused; it is not a count of unique members or just completed movies. It is independent of member ranking participation. Session titles, usernames, devices, IP addresses, and raw session objects are never returned to the browser or logged by this connection-summary adapter. The separate [Now Playing feature](NOW-PLAYING.md) can identify permitted active movie sessions using screening consent.
 
 A successful zero displays `0 streams`. Failed requests and missing/invalid counts display `— unavailable`, without hiding successful server status or inventory totals. Refresh the page to update; the existing connection-summary cache lasts 30 seconds. No automatic polling is enabled.

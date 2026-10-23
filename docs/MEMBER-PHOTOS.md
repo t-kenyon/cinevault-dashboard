@@ -32,7 +32,7 @@ These lines are additional Docker run options, not a standalone command. The pub
 2. In that member's Tautulli settings, set the custom avatar URL to `https://cinevault-dashboard.com/member-photos/cinema-friend.jpg` and save it.
 3. Allow up to 60 seconds for the dashboard's cached Tautulli user list to expire, then refresh.
 
-Only a configured photo assigned to a currently consenting member who appears in rankings or Recent Screenings is served. A file without an eligible assignment returns 404 even if it exists. The URL may therefore return 404 before it has been saved in Tautulli or while the previous assignment is cached. This is intentional. Existing Plex avatar URLs still work for users who have not chosen a custom URL; missing/unsupported images fall back to initials.
+Only a configured photo assigned to a currently consenting member who appears in rankings, completed Recent Screenings, or Now Playing is served. A file without an eligible assignment returns 404 even if it exists. The URL may therefore return 404 before it has been saved in Tautulli or while the previous assignment is cached. This is intentional. Existing Plex avatar URLs still work for users who have not chosen a custom URL; missing/unsupported images fall back to initials.
 
 The same URL works as Tautulli's image source and as a direct browser request. The dashboard reads local file bytes instead of sending a network request back through Cloudflare. Public page image URLs still use opaque artwork identifiers. Both access paths check current consent; responses are private/no-store and restricted to raster image content. There is no public upload or folder-listing endpoint.
 
