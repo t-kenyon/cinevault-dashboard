@@ -232,3 +232,6 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 .open-plex svg{width:18px;height:18px;flex:none}
 .open-plex:hover{background:#f2c36a;color:#17130d}
 .open-plex:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+
+/* Summary labels and values stand alone; descriptions only explain missing data. */
+.overview-stats article>strong{display:block}
