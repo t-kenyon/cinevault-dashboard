@@ -203,3 +203,6 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 @keyframes projector-light{0%,100%{opacity:.12}50%{opacity:.21}}
 @media(max-width:640px){.server-projector{width:58px;height:34px}}
 @media(prefers-reduced-motion:reduce){.projector-online .projector-reel,.projector-online .projector-beam{animation:none}.projector-online .projector-beam{opacity:.15}}
+
+/* Use the approved vault-door artwork as the homepage logo. */
+.vault-logo-scene{margin-bottom:12px}

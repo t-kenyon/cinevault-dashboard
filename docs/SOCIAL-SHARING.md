@@ -1,6 +1,6 @@
 # Main-link sharing preview
 
-The approved 1200 × 630 image is `src/app/opengraph-image.jpg`. It uses a silver CINE / gold VAULT wordmark with a standard A in front of a separate closed vault door. The original website hero logo remains unchanged.
+The approved 1200 × 630 image is `src/app/opengraph-image.jpg`. It uses a silver CINE / gold VAULT wordmark with a standard A in front of a separate closed vault door. The same approved artwork is also used as the homepage hero logo, with its natural 1200 × 630 proportions. The earlier logo asset is preserved in public/brand/.
 
 Next.js emits Open Graph image metadata from this file and its companion `opengraph-image.alt.txt`. `src/app/layout.tsx` provides the public base URL, title (CineVault Dashboard), preservation tagline and large-image Twitter card pointing to the same artwork. No member data or network service is required to render the preview image.
 
