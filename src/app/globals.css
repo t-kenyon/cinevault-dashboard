@@ -14,7 +14,7 @@ body{background:radial-gradient(ellipse at 75% 0%,#8c632014,transparent 40%),var
 .brand-tagline{font-size:clamp(17px,1.8vw,23px);font-weight:400;color:#c8c8c8;line-height:1.45;margin:15px 0 0;max-width:550px}
 .server{background:linear-gradient(125deg,#242424,#141414);border-color:#6f5530;border-top:2px solid var(--accent);padding:22px 25px;border-radius:5px}
 .server>strong{font-size:30px;margin:13px 0 20px}.server p{margin:14px 0 0}.server-line{align-items:center}
-.stats{margin-bottom:24px;border-radius:5px;background:var(--panel)}.stats article{padding:20px}.stats .eyebrow{font-size:10px;color:#bbbbbb;letter-spacing:1.3px}.stats strong{font-size:32px;font-weight:750;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-1px}.stats article>p:last-child{font-size:12px;line-height:1.5}
+.stats{margin-bottom:24px;border-radius:5px;background:var(--panel)}.stats article{padding:20px}.stats .eyebrow{font-size:10px;color:var(--accent);letter-spacing:1.3px}.stats strong{font-size:32px;font-weight:750;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums;letter-spacing:-1px}.stats article>p:last-child{font-size:12px;line-height:1.5}
 h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:29px;line-height:1.15;font-weight:750;letter-spacing:-.8px}h3{font-size:16px;font-weight:600}
 footer{font-family:var(--font-roboto),Arial,sans-serif;font-size:12px;line-height:1.6;color:#bbbbbb}footer span{float:none;display:block;margin-top:6px}
 @media(max-width:1000px){.hero{gap:25px}.vault-title{font-size:64px}.brand-tagline{font-size:19px}.stats article{padding:18px 20px}}
