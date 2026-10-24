@@ -1,12 +1,12 @@
 # Independent outage page
 
-Prepared locally; not deployed or enabled in Cloudflare.
+The original Worker route was enabled and outage/recovery tested on October 23, 2026. The updated offline design below is prepared locally; redeploy the Worker code to publish it.
 
 KenyonVault hosts both Plex and the dashboard. A page served by that machine cannot help when the machine, power or home internet is down. The prepared Worker runs on Cloudflare instead:
 
 Visitor → Cloudflare Worker → existing Tunnel → dashboard on KenyonVault.
 
-Healthy requests pass through unchanged. A failed home-page request (HTTP 5xx, network error, or an 8-second response-header timeout) receives a self-contained CineVault intermission page with HTTP 503 and a Try again link. No images, fonts, scripts, keys, member records or other files are fetched from KenyonVault to render this page. It is not a cached copy of member activity. It cannot protect against Cloudflare itself being down or a visitor's own internet connection failing. It does not detect Plex-only failure when the dashboard remains reachable, or failure partway through an already-streaming response.
+Healthy requests pass through unchanged. A failed home-page request (HTTP 5xx, network error, or an 8-second response-header timeout) receives a self-contained CineVault intermission page with HTTP 503 and a Try again link. The main website’s approved vault-door logo is embedded as a JPEG data URL in the Worker. No images, fonts, scripts, keys, member records or other files are fetched from KenyonVault to render this page. The page reads “Server offline”, “We'll be back soon.” and “We can’t reach KenyonVault right now. Please check back shortly.” It is not a cached copy of member activity. It cannot protect against Cloudflare itself being down or a visitor's own internet connection failing. It does not detect Plex-only failure when the dashboard remains reachable, or failure partway through an already-streaming response.
 
 ## Enable when ready
 
