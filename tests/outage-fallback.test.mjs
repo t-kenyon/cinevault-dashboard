@@ -17,7 +17,8 @@ test("origin and tunnel failures receive a self-contained uncached 503 page",asy
   assert.equal(response.headers.get("Retry-After"),"60");
   assert.match(response.headers.get("Content-Security-Policy"),/img-src data:/);
   const html=await response.text();
-  assert.match(html,/Server offline/);
+  assert.match(html,/Well, this is awkward\./);
+  assert.match(html,/CineVault is taking an unscheduled intermission\./);
   assert.match(html,/<img[^>]+src="data:image\/jpeg;base64,/);
   assert.doesNotMatch(html,/(?:src|href)="https?:/);
  }
