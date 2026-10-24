@@ -1,0 +1,12 @@
+services:
+  cinevault-dashboard:
+    image: cinevault-dashboard:local
+    build: .
+    container_name: cinevault-dashboard
+    restart: unless-stopped
+    ports:
+      - "${DASHBOARD_BIND_IP:-127.0.0.1}:${DASHBOARD_PORT:-3101}:3000"
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

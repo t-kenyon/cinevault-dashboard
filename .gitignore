@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+.env*
+!.env.example
+*.pem
+*.key
+.DS_Store
+coverage/
+# Private member consent records must never be published.
+private/
+consent*.json
+/member-photos/
