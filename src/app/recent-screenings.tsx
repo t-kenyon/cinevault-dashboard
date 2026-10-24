@@ -49,10 +49,10 @@ export function RecentScreenings({recent,initialNowPlaying,demo,unavailable}: {r
         </div>
         {play.durationSeconds !== null && <progress className="playback-progress" value={play.positionSeconds} max={play.durationSeconds} aria-label={`Playback progress for ${play.title}`} />}
         <h3>{play.title}</h3>
-        <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name}</p>
+        <p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span className="screening-member-label">{play.name}</span></p>
         {play.durationSeconds !== null && <p className="playback-remaining">{Math.ceil(Math.max(0,play.durationSeconds-play.positionSeconds)/60)} min remaining</p>}
       </li>)}
-      {recent.map(play => <li key={play.id}><MoviePoster src={play.poster} title={play.title} large /><h3>{play.title}</h3><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} />{play.name} · Completed</p><p><time dateTime={play.date}>{play.relativeDate}</time></p></li>)}
+      {recent.map(play => <li key={play.id}><MoviePoster src={play.poster} title={play.title} large /><h3>{play.title}</h3><p className="screening-member"><MemberAvatar name={play.name} src={play.photo} /><span className="screening-member-label">{play.name} · Completed</span></p><p><time dateTime={play.date}>{play.relativeDate}</time></p></li>)}
     </RecentScroller>
     {!demo && active.state === "unavailable" && <p className="note" role="status">Now Playing temporarily unavailable.</p>}
     {unavailable ? <p className="note">Recent screenings temporarily unavailable.</p> : !recent.length && !active.items.length && <p className="note">No completed screenings to share yet.</p>}

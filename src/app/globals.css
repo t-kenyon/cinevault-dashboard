@@ -206,3 +206,21 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 
 /* Use the approved vault-door artwork as the homepage logo. */
 .vault-logo-scene{margin-bottom:12px}
+.vault-logo-scene img{border-radius:8px}
+
+/* Keep full names readable without pushing mobile statistics out of their columns. */
+.member-label,.screening-member-label{min-width:0;overflow-wrap:anywhere}
+.screening-member-label{flex:1}
+.recent-rail h3{overflow-wrap:anywhere}
+@media(max-width:640px){
+ .leaderboard td:first-child{position:relative;padding-left:22px}
+ .leaderboard .rank{position:absolute;left:0;top:50%;transform:translateY(-50%);margin:0}
+ .leaderboard th:first-child{width:50%}
+ .leaderboard th:nth-child(2){width:22%}
+ .leaderboard th:last-child{width:28%}
+ .member-name{display:grid;grid-template-columns:23px minmax(0,1fr);max-width:100%;min-width:0}
+ .member-name .avatar{grid-column:1;grid-row:1}
+ .member-label{grid-column:2;grid-row:1}
+ .member-name .member-crown{grid-column:1;grid-row:1;align-self:center;justify-self:end;width:12px;height:12px;transform:translate(3px,12px);filter:drop-shadow(0 1px 1px #080808)}
+ .screening-member{flex-wrap:nowrap}
+}
