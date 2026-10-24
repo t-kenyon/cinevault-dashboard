@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "CineVault metallic gold and silver logo on a dark background" }],
+    images: [{ url: "/opengraph-image.jpg", width: 1200, height: 630, alt: "CineVault silver and gold wordmark in front of a closed bank vault door" }],
   },
   robots: { index: false, follow: false },
 };
