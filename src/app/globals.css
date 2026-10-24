@@ -191,3 +191,15 @@ h2{font-family:var(--font-roboto),Arial,sans-serif;font-size:36px;font-weight:70
 @media(prefers-reduced-motion:reduce){.dot:not(.dot-unavailable){animation:none;box-shadow:0 0 9px #a4c3a070}}
 .member-crown{width:17px;height:17px;flex:none;color:var(--accent);vertical-align:middle}
 @media(max-width:640px){.member-crown{width:14px;height:14px}}
+
+/* The projector follows server availability, even when nobody is streaming. */
+.server-projector{width:68px;height:40px;flex:none;margin-left:auto;color:var(--accent);overflow:visible}
+.projector-beam{opacity:0}
+.projector-offline{color:var(--muted);opacity:.45}
+.projector-online .projector-reel{transform-box:fill-box;transform-origin:center;animation:projector-reel-turn 3s linear infinite}
+.projector-online .projector-beam{opacity:.15;animation:projector-light 2.6s ease-in-out infinite}
+.projector-online .projector-lens{filter:drop-shadow(0 0 3px #e5b354)}
+@keyframes projector-reel-turn{to{transform:rotate(360deg)}}
+@keyframes projector-light{0%,100%{opacity:.12}50%{opacity:.21}}
+@media(max-width:640px){.server-projector{width:58px;height:34px}}
+@media(prefers-reduced-motion:reduce){.projector-online .projector-reel,.projector-online .projector-beam{animation:none}.projector-online .projector-beam{opacity:.15}}
